@@ -10,15 +10,46 @@ func NewHandler(service *LinkService) *LinkHandler {
 	return &LinkHandler{service: service}
 }
 
-func (l *LinkHandler) Shorten(c *gin.Context) {
+func (h *LinkHandler) Shorten(c *gin.Context) {
+	var req ShortenLinkRequest
 
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	shortCode, err := h.service.Shorten(c, req.URL)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"shortCode": shortCode})
 }
 
-func (l *LinkHandler) Get(c *gin.Context) {
+func (h *LinkHandler) Get(c *gin.Context) {
+	code := c.Param("code")
 
+	if code == "" {
+		c.JSON(400, gin.H{"error": "code is empty"})
+		return
+	}
+
+	record, err := h.service.GetRecord(c, code)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	if record == nil {
+		c.JSON(404, gin.H{"error": "Url Not Found"})
+		return
+	}
+
+	c.JSON(200, record)
 }
 
-func (l *LinkHandler) Update(c *gin.Context) {
+func (h *LinkHandler) Update(c *gin.Context) {
 
 }
 

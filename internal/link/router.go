@@ -10,14 +10,14 @@ func NewRouter(handler *LinkHandler) *gin.Engine {
 		// POST /api/shorten
 		api.POST("/", handler.Shorten)
 
-		// GET /api/shorten/:id
-		api.GET("/:id", handler.Get)
+		// GET /api/shorten/:code
+		api.GET("/:code", handler.Get)
 
-		// PUT /api/shorten/:id
-		api.PUT("/:id", handler.Update)
+		// PUT /api/shorten/:code
+		api.PUT("/:code", handler.Update)
 
-		// DELETE /api/links/:id
-		api.DELETE("/:id", handler.Delete)
+		// DELETE /api/links/:code
+		api.DELETE("/:code", handler.Delete)
 	}
 
 	return r
