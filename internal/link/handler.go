@@ -50,7 +50,25 @@ func (h *LinkHandler) Get(c *gin.Context) {
 }
 
 func (h *LinkHandler) Update(c *gin.Context) {
+	var req ShortenLinkRequest
 
+	code := c.Param("code")
+
+	if code == "" {
+		c.JSON(400, gin.H{"error": "code is empty"})
+		return
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.service.UpdateUrl(c, req.URL, code); err != nil {
+		c.JSON(404, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(200, "")
 }
 
 func (l *LinkHandler) Delete(c *gin.Context) {

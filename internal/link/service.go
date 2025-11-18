@@ -13,6 +13,19 @@ func NewService(repo *LinkRepo) *LinkService {
 	return &LinkService{repo: repo}
 }
 
+func (s *LinkService) UpdateUrl(ctx context.Context, url string, code string) error {
+	if code == "" {
+		return errors.New("code is empty")
+	}
+
+	err := s.repo.UpdateUrlByCode(ctx, url, code)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *LinkService) GetRecord(ctx context.Context, code string) (*Link, error) {
 	if code == "" {
 		return nil, errors.New("code is empty")
