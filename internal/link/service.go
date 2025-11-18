@@ -13,13 +13,24 @@ func NewService(repo *LinkRepo) *LinkService {
 	return &LinkService{repo: repo}
 }
 
+func (s *LinkService) DeleteRecord(ctx context.Context, code string) error {
+	if code == "" {
+		return errors.New("code is empty")
+	}
+
+	if err := s.repo.DeleteRecord(ctx, code); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *LinkService) UpdateUrl(ctx context.Context, url string, code string) error {
 	if code == "" {
 		return errors.New("code is empty")
 	}
 
-	err := s.repo.UpdateUrlByCode(ctx, url, code)
-	if err != nil {
+	if err := s.repo.UpdateUrlByCode(ctx, url, code); err != nil {
 		return err
 	}
 
@@ -62,8 +73,7 @@ func (s *LinkService) Shorten(ctx context.Context, url string) (string, error) {
 
 	shortCode := generateShortCode()
 
-	err = s.repo.Insert(ctx, &Link{URL: url, ShortCode: shortCode})
-	if err != nil {
+	if err = s.repo.Insert(ctx, &Link{URL: url, ShortCode: shortCode}); err != nil {
 		return "", errors.New("error while insert")
 	}
 	return shortCode, nil

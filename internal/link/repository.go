@@ -18,6 +18,23 @@ func NewRepository(store *storage.Mongo) *LinkRepo {
 	return &LinkRepo{store: store}
 }
 
+func (r *LinkRepo) DeleteRecord(ctx context.Context, code string) error {
+	collection := r.store.DB.Collection("url")
+
+	filter := bson.M{"shortCode": code}
+
+	result, err := collection.DeleteOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	if result.DeletedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
+	return nil
+}
+
 func (r *LinkRepo) UpdateUrlByCode(ctx context.Context, url string, code string) error {
 	collection := r.store.DB.Collection("url")
 
