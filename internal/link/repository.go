@@ -29,7 +29,7 @@ func (r *LinkRepo) DeleteRecord(ctx context.Context, code string) error {
 	}
 
 	if result.DeletedCount == 0 {
-		return mongo.ErrNoDocuments
+		return ErrNotFound
 	}
 
 	return nil
@@ -47,7 +47,7 @@ func (r *LinkRepo) UpdateUrlByCode(ctx context.Context, url string, code string)
 	}
 
 	if result.MatchedCount == 0 {
-		return mongo.ErrNoDocuments
+		return ErrNotFound
 	}
 
 	return nil

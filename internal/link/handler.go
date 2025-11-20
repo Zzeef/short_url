@@ -1,6 +1,10 @@
 package link
 
-import "github.com/gin-gonic/gin"
+import (
+	"errors"
+
+	"github.com/gin-gonic/gin"
+)
 
 type LinkHandler struct {
 	service *LinkService
@@ -64,12 +68,17 @@ func (h *LinkHandler) Update(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdateUrl(c, req.URL, code); err != nil {
-		c.JSON(404, gin.H{"error": err.Error()})
+	err := h.service.UpdateUrl(c, req.URL, code)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			c.JSON(404, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(200, "")
+	c.Status(200)
 }
 
 func (h *LinkHandler) Delete(c *gin.Context) {
@@ -80,10 +89,15 @@ func (h *LinkHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteRecord(c, code); err != nil {
-		c.JSON(404, gin.H{"error": err.Error()})
+	err := h.service.DeleteRecord(c, code)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			c.JSON(404, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(204, "")
+	c.Status(204)
 }

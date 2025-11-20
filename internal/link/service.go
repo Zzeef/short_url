@@ -17,24 +17,14 @@ func (s *LinkService) DeleteRecord(ctx context.Context, code string) error {
 	if code == "" {
 		return errors.New("code is empty")
 	}
-
-	if err := s.repo.DeleteRecord(ctx, code); err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.DeleteRecord(ctx, code)
 }
 
-func (s *LinkService) UpdateUrl(ctx context.Context, url string, code string) error {
+func (s *LinkService) UpdateUrl(ctx context.Context, url, code string) error {
 	if code == "" {
 		return errors.New("code is empty")
 	}
-
-	if err := s.repo.UpdateUrlByCode(ctx, url, code); err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.UpdateUrlByCode(ctx, url, code)
 }
 
 func (s *LinkService) GetRecord(ctx context.Context, code string) (*Link, error) {
@@ -63,7 +53,7 @@ func (s *LinkService) Shorten(ctx context.Context, url string) (string, error) {
 		return "", errors.New("url is empty")
 	}
 
-	record, err := s.repo.GetRecordByColumn(ctx, "URL", url)
+	record, err := s.repo.GetRecordByColumn(ctx, "url", url)
 	if err != nil {
 		return "", err
 	}
@@ -72,9 +62,10 @@ func (s *LinkService) Shorten(ctx context.Context, url string) (string, error) {
 	}
 
 	shortCode := generateShortCode()
+	link := &Link{URL: url, ShortCode: shortCode}
 
-	if err = s.repo.Insert(ctx, &Link{URL: url, ShortCode: shortCode}); err != nil {
-		return "", errors.New("error while insert")
+	if err := s.repo.Insert(ctx, link); err != nil {
+		return "", err
 	}
 	return shortCode, nil
 }

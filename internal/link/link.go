@@ -1,6 +1,9 @@
 package link
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type Link struct {
 	URL       string    `bson:"url" json:"url"`
@@ -13,3 +16,5 @@ type Link struct {
 type ShortenLinkRequest struct {
 	URL string `json:"url" binding:"required,url"`
 }
+
+var ErrNotFound = errors.New("record not found")
