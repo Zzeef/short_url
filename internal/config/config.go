@@ -1,39 +1,36 @@
 package config
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	HTTPServer struct {
-		Port string `mapstructure:"port"`
-	} `mapstructure:"http_server"`
-
-	Database struct {
-		Host     string `mapstructure:"host"`
-		Port     string `mapstructure:"port"`
-		User     string `mapstructure:"user"`
-		Password string `mapstructure:"password"`
-		DBName   string `mapstructure:"db_name"`
-		SSLMode  string `mapstructure:"ssl_mode"`
-	} `mapstructure:"database"`
+	Port string
+	DB   struct {
+		Host     string
+		User     string
+		Password string
+		Name     string
+	}
 }
 
-func LoadConfig() (*Config, error) {
-	viper.AddConfigPath("./config")
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
+func LoadConfig() Config {
+	viper.SetConfigFile("internal/config/config.env")
+	viper.SetConfigType("env")
 
-	if err := viper.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("ошибка чтения конфига: %w", err)
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatalf("Error reading config file: %v", err)
 	}
 
 	var cfg Config
-	if err := viper.Unmarshal(&cfg); err != nil {
-		return nil, fmt.Errorf("ошибка парсинга конфига: %w", err)
-	}
+	cfg.Port = viper.GetString("PORT")
+	cfg.DB.Host = viper.GetString("DB_HOST")
+	cfg.DB.User = viper.GetString("DB_USER")
+	cfg.DB.Password = viper.GetString("DB_PASSWORD")
+	cfg.DB.Name = viper.GetString("DB_NAME")
 
-	return &cfg, nil
+	return cfg
 }

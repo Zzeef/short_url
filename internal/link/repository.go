@@ -19,7 +19,7 @@ func NewRepository(store *storage.Mongo) *LinkRepo {
 }
 
 func (r *LinkRepo) DeleteRecord(ctx context.Context, code string) error {
-	collection := r.store.DB.Collection("url")
+	collection := r.store.DB.Collection("link")
 
 	filter := bson.M{"shortCode": code}
 
@@ -36,7 +36,7 @@ func (r *LinkRepo) DeleteRecord(ctx context.Context, code string) error {
 }
 
 func (r *LinkRepo) UpdateUrlByCode(ctx context.Context, url string, code string) error {
-	collection := r.store.DB.Collection("url")
+	collection := r.store.DB.Collection("link")
 
 	filter := bson.M{"shortCode": code}
 	update := bson.M{"$set": bson.M{"url": url, "updatedAt": time.Now()}}
@@ -54,7 +54,7 @@ func (r *LinkRepo) UpdateUrlByCode(ctx context.Context, url string, code string)
 }
 
 func (r *LinkRepo) GetRecordByColumn(ctx context.Context, column string, value string) (*Link, error) {
-	collection := r.store.DB.Collection("url")
+	collection := r.store.DB.Collection("link")
 
 	var result Link
 	err := collection.FindOne(ctx, bson.M{column: value}).Decode(&result)
@@ -77,7 +77,7 @@ func fillDefaultFields(link *Link) {
 }
 
 func (r *LinkRepo) Insert(ctx context.Context, link *Link) error {
-	collection := r.store.DB.Collection("url")
+	collection := r.store.DB.Collection("link")
 
 	fillDefaultFields(link)
 	_, err := collection.InsertOne(ctx, link)
